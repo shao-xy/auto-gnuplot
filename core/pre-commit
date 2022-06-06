@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# To use this script, create a soft link to directory '.git/hooks/'.
+# For example, use the following command:
+#
+# $ (cd <project-root>/.git/hooks/ && ln -s ../../core/pre-commit)
+#
+# Enjoy by yourself!
+
+EMPH_START=
+EMPH_END=
+if test -t 1 -a -t 2; then
+	EMPH_START="\033[1;33m"
+	EMPH_END="\033[0m"
+fi
+
+echo
+echo -e "${EMPH_START}Automatically drawing figures before commit:${EMPH_END}"
+make --no-print-directory
+_errno=$?
+if test $_errno -ne 0; then
+	>&2 echo "Draw figures failed. Abort commit."
+	exit $_errno
+fi
+echo
+echo "Done."
+echo "================================================="
