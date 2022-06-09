@@ -1,8 +1,8 @@
 # input:
-# output: demo/sampling.1.png
+# output: sampling.1.png
 
 set terminal pngcairo  transparent enhanced font "arial,10" fontscale 1.0 size 600, 400 
-set output 'demo/sampling.1.png'
+set output 'sampling.1.png'
 set key fixed right top vertical Right noreverse enhanced autotitle box lt black linewidth 1.000 dashtype solid
 set key opaque
 set style data lines

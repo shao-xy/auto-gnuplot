@@ -21,15 +21,29 @@ function errcho()
 
 function prepare()
 {
-	if test $# -ne 1; then
-		errcho -e "Usage: $0 <gnuplot-script>"
+	if test $# -lt 1; then
+		errcho -e "Usage: $0 <gnuplot-script> [dep-file ...]"
 		exit 1
 	fi
-	local src=$(realpath $1)
+	local src="$1"
 	if test ! -f "$src"; then
 		errcho -e "Source file not found: $src"
 		exit 2
 	fi
+	shift
+	for depfile in $*; do
+		if test ! -f "$depfile"; then
+			errcho -e "Dependency file not found: $depfile"
+			exit 2
+		fi
+		# Absolute path?
+		if [[ "${depfile:0:1}" == / || "${depfile:0:2}" == ~[/a-zA-Z] ]]; then
+			continue
+		fi
+		local target_dir="${OUTPUTDIR_BASENAME}/$(dirname ${depfile#src/})"
+		mkdir -p "$target_dir"
+		ln -sf $(realpath $depfile) "$target_dir"
+	done
 	echo "$src"
 }
 
@@ -81,11 +95,13 @@ function execute_or_fail()
 
 function do_draw()
 {
+	local src="$1"
+	local abs_src="$(realpath "$1")"
 	local mayfail=$3
-	cd $(dirname $(realpath $0))/..
-	test -d "$OUTPUTDIR_BASENAME" || mkdir -p "$OUTPUTDIR_BASENAME"
-	cd "$OUTPUTDIR_BASENAME"
-	execute_or_fail 0 gnuplot "$1" < /dev/null
+	local target_dir=${OUTPUTDIR_BASENAME}/$(dirname ${src#src/})
+	test -d "$target_dir" || mkdir -p "$target_dir"
+	cd "$target_dir"
+	execute_or_fail 0 gnuplot "$abs_src" < /dev/null
 	local suffix="${2##*.}"
 	if [[ "$suffix" == "pdf" ]]; then
 		execute_or_fail $mayfail pdfcrop "$2"

@@ -46,11 +46,12 @@ There might be many input files in different hint lines, or none at all, but no 
 
 Both absolute and relative paths are supported. For relative paths, input and output lines behave differently.
 
-In terms of output lines, relative paths always start from the `output` directory. For example, the next line refers to `output/foo/bar.png`:
+In terms of output lines, relative paths always start from a similar same path in the `output` directory. The prefix `src/` is replaced with `output/`, and figures are drawn starting in the same parent path. For example, the next line in `src/foo/bar.gnu` refers to `output/foo/bar.png`:
 
 ```gnuplot
-# output: foo/bar.png
+# output: bar.png
 ```
+Since `bar.png` is a relative path, and its source file is `foo/bar.gnu`, this tool copies the hierarchy of `foo/` under `src/` to `output/`, and then draws `bar.png` there.
 
 In terms of input lines, relative paths means the current directory of the Gnuplot script. For example, files in `src` directory is organized as below:
 

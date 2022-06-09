@@ -99,7 +99,12 @@ while read f; do
 	_errno=$?
 	test $_errno -eq 0 || exit $_errno
 
-	read t i <<< "$in_out"
+	read _t i <<< "$in_out"
+	if [[ "${_t:0:1}" == / || "${input_file:0:2}" == ~[/a-zA-Z] ]]; then
+		t="$_t"
+	else
+		t="output/$(dirname ${f#src/})/${_t}"
+	fi
 	src_map["$t"]="$f"
 	deps["$t"]="$f $i"
 done
@@ -108,12 +113,12 @@ errcho "Generating Makefile ..."
 errcho "Adding deps ..."
 echo -n "RAW_TARGETS := "
 for t in ${!deps[@]}; do
-	echo -n "$t "
+	echo -n "$(basename $t) "
 done
 echo ""
 echo -n "TARGETS := "
 for t in ${!deps[@]}; do
-	echo -n "output/$t "
+	echo -n "$t "
 done
 echo ""
 
@@ -129,12 +134,12 @@ for t in ${!deps[@]}; do
 	src=${deps[$t]}
 	errcho "Adding rules for ${src_map[$t]} ..."
 	cat << EOF
-${t}: output/${t}
+$(basename ${t}): ${t}
 
-output/${t}: ${DRAW_SCRIPT} ${src}
-	@mkdir -p $(dirname output/${t})
-	@echo -e "\t${t}"
-	@sh \$< \$(word 2,\$^) >/dev/null
+${t}: ${DRAW_SCRIPT} ${src}
+	@echo -e "\t${t#output/}"
+	@mkdir -p $(dirname ${t})
+	@bash \$< \$(filter-out \$<,\$^) >/dev/null
 
 EOF
 done
