@@ -42,7 +42,7 @@ function prepare()
 		fi
 		local target_dir="${OUTPUTDIR_BASENAME}/$(dirname ${depfile#src/})"
 		mkdir -p "$target_dir"
-		ln -sf $(realpath $depfile) "$target_dir"
+		test -h "$target_dir/$(basename $depfile)" || ln -sf $(realpath $depfile) "$target_dir"
 	done
 	echo "$src"
 }
