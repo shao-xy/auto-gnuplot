@@ -1,6 +1,10 @@
 # Auto-Gnuplot
 This project is aimed at helping generate Makefile for multiple Gnuplot scripts. All the script with names ended with `.gnu` in `src` directory are regarded as scripts to run. Their output will all be redirected to the `output` directory.
 
+## Already known BUG
+
+This project is known to be suitable only for .gnu files that use **LF ('\n')** as the line ending and **CANNOT** handle `.gnu` files that use **CRLF ('\r\n')** as the line ending. Therefore, it is best suited for plotting in Linux distributions. It may be fixed in the future.
+
 ## Requirements
 
 This script MUST be run with `/bin/bash`, which is available in most popular Linux distributions nowadays.
